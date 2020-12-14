@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>canvas{border: 1px solid #1b53ee;}</style>
+</head>
+<body>
+    <canvas id="my"></canvas>
+    <script src="noise.js"></script>
+    <script>
+        let colors = ["#ffffff", "#d0e1f9","#4d648d","#283655","#1e1f26"]
+        let canvas = document.getElementById("my")
+        let ctx = canvas.getContext('2d')
+        let width = 900
+        let number = 15
+        let margin = 0.2
+        canvas.width = width
+        canvas.height = width
+        
+        //сетка
+
+        const lerp = (a,b,t) => (a*(1-t) + b*t)
+        //линейная интерполяция a,b или число между ними
+
+        const createGrid = (count) => {
+            let points = []
+            for(let i = 0; i <= count; i++) {
+                for(let j = 0; j <= count; j++) {
+                    let x = lerp(margin*width,width-width*margin, i/count)
+                    let y = lerp(margin*width,width-width*margin, j/count)
+                    points.push({
+                        position: [x,y]
+                    })
+                }
+            }
+
+            return points
+        }
+
+        
+        let grid = createGrid(number)
+        //размер ячейки
+        let cellSize = (width-2*margin*width)/number
+
+        function drawArc(){
+            //в половине случаев рандомно вращаем га 90
+
+            if(Math.random()>0.5) ctx.rotate(Math.PI/2)
+            //ctx.strokeRect(-cellSize/2,-cellSize/2,cellSize,cellSize)
+            //координаты центра окруж., радиус, размер дуги в радианах [0,2PI]
+
+            for(let i = 0; i < 30; i++) {
+
+                ctx.strokeStyle = colors[Math.floor(Math.random()*colors.length)]
+
+                ctx.beginPath()
+
+            //1/4 окруж 1.5*Math.PI, 2*Math.PI [270;360]
+            ctx.arc(-cellSize/2,cellSize/2,cellSize-i, 1.5*Math.PI, 2*Math.PI)
+            ctx.stroke()
+
+            ctx.beginPath()
+
+            //1/4 окруж 0.5*Math.PI, Math.PI [90;180]
+            ctx.arc(cellSize/2,-cellSize/2,cellSize-i, 0.5*Math.PI, Math.PI)
+            ctx.stroke()
+            }
+            
+        }
+
+
+        grid.forEach(item => {
+            ctx.save()
+            //ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)]
+            ctx.translate(item.position[0], item.position[1])
+            drawArc()
+            //ctx.strokeRect(0,0,cellSize,cellSize)
+            //border
+            ctx.restore()
+        })
+
+        
+    </script>
+</body>
+</html>
